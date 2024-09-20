@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Login Cliente</title>
+    <!-- Fonte Montserrat do Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Arquivo CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h2>Login Cliente</h2>
+
+    <div class="container">
+        <label for="email">Email:</label>
+        <input type="email" id="email" required>
+
+        <label for="senha">Senha:</label>
+        <input type="password" id="senha" required>
+
+        <button id="loginClienteBtn">Entrar</button>
+        <p class="error" id="errorMsg"></p>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Evento de login do cliente
+        document.getElementById('loginClienteBtn').addEventListener('click', function() {
+            const email = document.getElementById('email').value;
+            const senha = document.getElementById('senha').value;
+
+            // Tentar realizar o login do cliente
+            const resultado = loginUsuario('clientes', email, senha);
+
+            if (resultado.success) {
+                // Verificar se uma barbearia foi selecionada
+                const barbeariaSelecionada = sessionStorage.getItem('barbeariaSelecionada');
+                
+                if (barbeariaSelecionada) {
+                    // Redirecionar para a página de agendamento da barbearia
+                    window.location.href = `schedule.html?barbearia=${barbeariaSelecionada}`;
+                } else {
+                    // Redirecionar para uma página padrão, se não houver barbearia selecionada
+                    window.location.href = 'schedule.html';
+                }
+            } else {
+                document.getElementById('errorMsg').innerText = resultado.message;
+            }
+        });
+    </script>
+</body>
+</html>

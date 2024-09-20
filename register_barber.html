@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastro da Barbearia</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h2>Cadastro da Barbearia</h2>
+
+    <div class="container">
+        <label for="nomeBarbearia">Nome da Barbearia:</label>
+        <input type="text" id="nomeBarbearia" required>
+
+        <label for="emailBarbearia">Email da Barbearia:</label>
+        <input type="email" id="emailBarbearia" required>
+
+        <label for="senhaBarbearia">Senha:</label>
+        <input type="password" id="senhaBarbearia" required>
+
+        <label for="horarioAbertura">Horário de Abertura:</label>
+        <input type="time" id="horarioAbertura" required>
+
+        <label for="horarioFechamento">Horário de Fechamento:</label>
+        <input type="time" id="horarioFechamento" required>
+
+        <h3>Adicionar Serviço</h3>
+        <label for="nomeServico">Nome do Serviço:</label>
+        <input type="text" id="nomeServico" required>
+
+        <label for="duracaoServico">Duração (minutos):</label>
+        <input type="number" id="duracaoServico" required>
+
+        <label for="precoServico">Preço (R$):</label>
+        <input type="number" id="precoServico" required>
+
+        <button id="adicionarServicoBtn">Adicionar Serviço</button>
+
+        <h3>Serviços Adicionados</h3>
+        <ul id="listaServicos">
+            <!-- Serviços adicionados aparecerão aqui -->
+        </ul>
+
+        <button id="cadastrarBarbeariaBtn">Cadastrar Barbearia e Serviços</button>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+
+       
+
+
+        let servicos = [];
+
+        function adicionarServico() {
+            const nomeServico = document.getElementById('nomeServico').value;
+            const duracaoServico = Number(document.getElementById('duracaoServico').value);
+            const precoServico = Number(document.getElementById('precoServico').value);
+
+            if (!nomeServico || !duracaoServico || !precoServico) {
+                alert('Preencha todos os campos do serviço.');
+                return;
+            }
+
+            const novoServico = { nome: nomeServico, duracao: duracaoServico, preco: precoServico };
+            servicos.push(novoServico);
+
+            // Exibir o serviço na lista
+            const listaServicos = document.getElementById('listaServicos');
+            const li = document.createElement('li');
+            li.textContent = `${nomeServico} - ${duracaoServico} min - R$ ${precoServico}`;
+            listaServicos.appendChild(li);
+
+            // Limpar os campos do serviço
+            document.getElementById('nomeServico').value = '';
+            document.getElementById('duracaoServico').value = '';
+            document.getElementById('precoServico').value = '';
+        }
+
+        function cadastrarBarbearia() {
+             document.getElementById('cadastrarBarbeariaBtn').addEventListener('click', function() {
+    const nome = document.getElementById('nomeBarbearia').value;
+    const email = document.getElementById('emailBarbearia').value;
+    const senha = document.getElementById('senhaBarbearia').value;
+    const horarioAbertura = document.getElementById('horarioAbertura').value;
+    const horarioFechamento = document.getElementById('horarioFechamento').value;
+
+    if (!nome || !email || !senha || !horarioAbertura || !horarioFechamento) {
+        alert('Por favor, preencha todos os campos.');
+        return;
+    }
+
+    const novaBarbearia = {
+        nome,
+        email,
+        senha, // Senha sendo armazenada aqui
+        horarioAbertura,
+        horarioFechamento
+    };
+
+    const barbearias = JSON.parse(localStorage.getItem('barbearias')) || [];
+    barbearias.push(novaBarbearia);
+    localStorage.setItem('barbearias', JSON.stringify(barbearias));
+
+    alert('Barbearia cadastrada com sucesso!');
+    window.location.href = 'index.html'; // Redirecionar para a página de login
+});
+
+        }
+
+        document.getElementById('adicionarServicoBtn').addEventListener('click', adicionarServico);
+        document.getElementById('cadastrarBarbeariaBtn').addEventListener('click', cadastrarBarbearia);
+    </script>
+</body>
+</html>

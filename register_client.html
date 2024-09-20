@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Registrar Cliente</title>
+    <!-- Fonte Montserrat do Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Arquivo CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h2>Registrar Cliente</h2>
+
+    <div class="container">
+        <label for="nome">Nome:</label>
+        <input type="text" id="nome" required>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" required>
+
+        <label for="senha">Senha:</label>
+        <input type="password" id="senha" required>
+
+        <button id="registerBtn">Registrar</button>
+        <p class="error" id="errorMsg"></p>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Função para simular registro no localStorage
+        function registrarUsuario(colecao, dados) {
+            // Verifica se os campos estão preenchidos
+            if (!dados.nome || !dados.email || !dados.senha) {
+                return { success: false, message: 'Todos os campos são obrigatórios.' };
+            }
+
+            // Simulando a gravação no localStorage (para fins de teste)
+            let clientes = JSON.parse(localStorage.getItem(colecao)) || [];
+            clientes.push(dados);
+            localStorage.setItem(colecao, JSON.stringify(clientes));
+
+            // Retorna sucesso
+            return { success: true, message: 'Registro realizado com sucesso!' };
+        }
+
+        // Evento de registro do cliente
+        document.getElementById('registerBtn').addEventListener('click', function() {
+            const nome = document.getElementById('nome').value;
+            const email = document.getElementById('email').value;
+            const senha = document.getElementById('senha').value;
+
+            // Tentar registrar o cliente
+            const resultado = registrarUsuario('clientes', { nome, email, senha });
+
+            if (resultado.success) {
+                alert('Registro realizado com sucesso!');
+                window.location.href = 'login_client.html';
+            } else {
+                document.getElementById('errorMsg').innerText = resultado.message;
+            }
+        });
+    </script>
+</body>
+</html>

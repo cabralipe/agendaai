@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - Gerenciar Clientes e Barbearias</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h2>Gerenciar Clientes e Barbearias</h2>
+
+    <div class="container">
+        <h3>Clientes</h3>
+        <table id="clientesTable">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Clientes serão carregados aqui -->
+            </tbody>
+        </table>
+
+        <h3>Barbearias</h3>
+        <table id="barbeariasTable">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Horário de Abertura</th>
+                    <th>Horário de Fechamento</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Barbearias serão carregadas aqui -->
+            </tbody>
+        </table>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Função para carregar os clientes
+        function carregarClientes() {
+            const clientes = JSON.parse(localStorage.getItem('clientes')) || [];
+            const clientesTable = document.getElementById('clientesTable').querySelector('tbody');
+            clientesTable.innerHTML = '';
+
+            clientes.forEach((cliente, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${cliente.nome}</td>
+                    <td>${cliente.email}</td>
+                    <td>
+                        <button onclick="editarCliente(${index})">Editar</button>
+                        <button onclick="deletarCliente(${index})">Deletar</button>
+                    </td>
+                `;
+                clientesTable.appendChild(row);
+            });
+        }
+
+        // Função para carregar as barbearias
+        function carregarBarbearias() {
+            const barbearias = JSON.parse(localStorage.getItem('barbearias')) || [];
+            const barbeariasTable = document.getElementById('barbeariasTable').querySelector('tbody');
+            barbeariasTable.innerHTML = '';
+
+            barbearias.forEach((barbearia, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${barbearia.nome}</td>
+                    <td>${barbearia.horarioAbertura}</td>
+                    <td>${barbearia.horarioFechamento}</td>
+                    <td>
+                        <button onclick="editarBarbearia(${index})">Editar</button>
+                        <button onclick="deletarBarbearia(${index})">Deletar</button>
+                    </td>
+                `;
+                barbeariasTable.appendChild(row);
+            });
+        }
+
+        // Função para editar um cliente
+        function editarCliente(index) {
+            const clientes = JSON.parse(localStorage.getItem('clientes')) || [];
+            const cliente = clientes[index];
+
+            const nome = prompt('Editar Nome do Cliente:', cliente.nome);
+            const email = prompt('Editar Email do Cliente:', cliente.email);
+
+            if (nome && email) {
+                clientes[index] = { nome, email };
+                localStorage.setItem('clientes', JSON.stringify(clientes));
+                carregarClientes(); // Recarregar a lista
+            }
+        }
+
+        // Função para deletar um cliente
+        function deletarCliente(index) {
+            const clientes = JSON.parse(localStorage.getItem('clientes')) || [];
+            if (confirm('Tem certeza que deseja deletar este cliente?')) {
+                clientes.splice(index, 1);
+                localStorage.setItem('clientes', JSON.stringify(clientes));
+                carregarClientes(); // Recarregar a lista
+            }
+        }
+
+        // Função para editar uma barbearia
+        function editarBarbearia(index) {
+            const barbearias = JSON.parse(localStorage.getItem('barbearias')) || [];
+            const barbearia = barbearias[index];
+
+            const nome = prompt('Editar Nome da Barbearia:', barbearia.nome);
+            const horarioAbertura = prompt('Editar Horário de Abertura:', barbearia.horarioAbertura);
+            const horarioFechamento = prompt('Editar Horário de Fechamento:', barbearia.horarioFechamento);
+
+            if (nome && horarioAbertura && horarioFechamento) {
+                barbearias[index] = { nome, horarioAbertura, horarioFechamento, servicos: barbearia.servicos };
+                localStorage.setItem('barbearias', JSON.stringify(barbearias));
+                carregarBarbearias(); // Recarregar a lista
+            }
+        }
+
+        // Função para deletar uma barbearia
+        function deletarBarbearia(index) {
+            const barbearias = JSON.parse(localStorage.getItem('barbearias')) || [];
+            if (confirm('Tem certeza que deseja deletar esta barbearia?')) {
+                barbearias.splice(index, 1);
+                localStorage.setItem('barbearias', JSON.stringify(barbearias));
+                carregarBarbearias(); // Recarregar a lista
+            }
+        }
+
+        // Carregar dados ao abrir a página
+        carregarClientes();
+        carregarBarbearias();
+    </script>
+</body>
+</html>

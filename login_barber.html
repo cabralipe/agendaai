@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Login Barbearia</title>
+    <!-- Fonte Montserrat do Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Arquivo CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h2>Login Barbearia</h2>
+
+    <div class="container">
+        <label for="email">Email:</label>
+        <input type="email" id="email" required>
+
+        <label for="senha">Senha:</label>
+        <input type="password" id="senha" required>
+
+        <button id="loginBarbeariaBtn">Entrar</button>
+        <p class="error" id="errorMsg"></p> <!-- Exibir erro aqui -->
+    </div>
+
+    <!-- Mover o script para o final -->
+    <script src="script.js"></script>
+    <script>
+        // Função de login quando o botão "Entrar" é clicado
+        document.getElementById('loginBarbeariaBtn').addEventListener('click', function() {
+            console.log('O botão Entrar foi clicado!'); // Depuração
+            const emailInput = document.getElementById('email').value.trim().toLowerCase();
+            const senhaInput = document.getElementById('senha').value.trim();
+            const errorMsg = document.getElementById('errorMsg');
+            errorMsg.textContent = ''; // Limpa a mensagem de erro
+
+            // Recuperar as barbearias do localStorage
+            const barbearias = JSON.parse(localStorage.getItem('barbearias')) || [];
+
+            // Verificar se a barbearia com o email e senha fornecidos existe
+            const barbeariaEncontrada = barbearias.find(barbearia => 
+                barbearia.email.toLowerCase() === emailInput && barbearia.senha === senhaInput
+            );
+
+            if (barbeariaEncontrada) {
+                // Armazenar a sessão do usuário (simula login)
+                sessionStorage.setItem('barbeariaLogada', JSON.stringify(barbeariaEncontrada));
+
+                // Redirecionar para a página da barbearia
+                alert('Login realizado com sucesso!');
+                window.location.href = 'barber_services.html';
+            } else {
+                // Exibir mensagem de erro diretamente na página
+                errorMsg.textContent = 'Email ou senha incorretos!';
+                errorMsg.style.color = 'red'; // Exibir erro em vermelho
+            }
+        });
+    </script>
+</body>
+</html>

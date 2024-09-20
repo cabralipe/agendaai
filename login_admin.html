@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Login Administrador</title>
+    <!-- Fonte Montserrat do Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Arquivo CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h2>Login Administrador</h2>
+
+    <div class="container">
+        <label for="email">Email:</label>
+        <input type="email" id="email" required>
+
+        <label for="senha">Senha:</label>
+        <input type="password" id="senha" required>
+
+        <button id="loginBtn">Entrar</button>
+        <p class="error" id="errorMsg"></p>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Evento de login do administrador
+        document.getElementById('loginBtn').addEventListener('click', function() {
+            const email = document.getElementById('email').value;
+            const senha = document.getElementById('senha').value;
+
+            // Tentar realizar o login do administrador
+            const resultado = loginUsuario('administradores', email, senha);
+
+            if (resultado.success) {
+                window.location.href = 'admin.html';
+            } else {
+                document.getElementById('errorMsg').innerText = resultado.message;
+            }
+        });
+    </script>
+</body>
+</html>

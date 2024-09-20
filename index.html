@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Página Inicial - Barbearia</title>
+    <!-- Fonte Montserrat do Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Arquivo CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <center><h1>Agenda Aí!</h1></center>
+
+    <!-- Navegação -->
+    <nav>
+        <ul id="menu">
+            <li><a href="index.html">Início</a></li>
+            <!-- Links adicionais serão inseridos via JavaScript -->
+        </ul>
+    </nav>
+
+    <div id="barbeariasGrid" class="barbearias-grid">
+    <!-- Barbearias serão carregadas aqui via JavaScript -->
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+    const barbearias = JSON.parse(localStorage.getItem('barbearias')) || [];
+    const grid = document.getElementById('barbeariasGrid');
+
+    barbearias.forEach(barbearia => {
+        const div = document.createElement('div');
+        div.classList.add('barbearia-item');
+        div.textContent = barbearia.nome; // Assumindo que cada barbearia tem uma propriedade 'nome'
+        
+        // Fazendo o quadrinho ser clicável e redirecionando para a página de agendamento
+        div.addEventListener('click', () => {
+            window.location.href = `schedule.html?barbeariaId=${barbearia.id}`; // Assumindo que cada barbearia tem um 'id' único
+        });
+
+        grid.appendChild(div);
+    });
+});
+
+    </script>
+</div>
+
+
+    <!-- Scripts -->
+    <script src="script.js"></script>
+    <script>
+        // Adicionar links ao menu com base no usuário logado
+        const usuarioLogado = JSON.parse(sessionStorage.getItem('usuarioLogado'));
+        const menu = document.getElementById('menu');
+
+        if (usuarioLogado) {
+            // Verifica o tipo de usuário logado e adiciona os links apropriados
+            if (usuarioLogado.tipo === 'clientes') {
+                menu.innerHTML += `
+                    <li><a href="schedule.html">Agendar Horário</a></li>
+                    <li><a href="#" id="logoutBtn">Logout</a></li>
+                `;
+            } else if (usuarioLogado.tipo === 'barbearias') {
+                menu.innerHTML += `
+                    <li><a href="appointments.html">Ver Agendamentos</a></li>
+                    <li><a href="barber_services.html">Gerenciar Serviços</a></li>
+                    <li><a href="#" id="logoutBtn">Logout</a></li>
+                `;
+            } else if (usuarioLogado.tipo === 'administradores') {
+                menu.innerHTML += `
+                    <li><a href="admin.html">Administração</a></li>
+                    <li><a href="#" id="logoutBtn">Logout</a></li>
+                `;
+            }
+
+            // Evento de logout
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                sessionStorage.removeItem('usuarioLogado');
+                window.location.href = 'index.html';
+            });
+
+        } else {
+            // Se nenhum usuário estiver logado, adicionar os links de login e registro
+            menu.innerHTML += `
+                <li><a href="login_client.html">Login Cliente</a></li>
+                <li><a href="register_client.html">Registrar Cliente</a></li>
+                <li><a href="login_barber.html">Login Barbearia</a></li>
+                <li><a href="register_barber.html">Registrar Barbearia</a></li>
+                <li><a href="login_admin.html">Login Administrador</a></li>
+            `;
+        }
+
+        // Função para carregar as barbearias cadastradas
+        function carregarBarbearias() {
+            const barbearias = JSON.parse(localStorage.getItem('barbearias')) || [];
+            const barbeariasContainer = document.getElementById('barbeariasContainer');
+
+            // Limpar o container antes de preencher
+            barbeariasContainer.innerHTML = '';
+
+            // Criar um quadrinho para cada barbearia
+            barbearias.forEach(barbearia => {
+                const barbeariaDiv = document.createElement('div');
+                barbeariaDiv.classList.add('barbearia-quad');
+                barbeariaDiv.innerHTML = `
+                    <h3>${barbearia.nome}</h3>
+                    <p>Email: ${barbearia.email}</p>
+                    <button onclick="selecionarBarbearia('${barbearia.id}')">Selecionar</button>
+                `;
+                barbeariasContainer.appendChild(barbeariaDiv);
+            });
+        }
+
+        // Função para selecionar uma barbearia e redirecionar para o login do cliente
+        function selecionarBarbearia(barbeariaId) {
+            // Armazenar a barbearia selecionada no sessionStorage
+            sessionStorage.setItem('barbeariaSelecionada', barbeariaId);
+            // Redirecionar para o login do cliente
+            window.location.href = 'login_client.html';
+        }
+
+        // Carregar as barbearias ao abrir a página
+        carregarBarbearias();
+
+
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Agendar Horário</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h2>Agendar Horário</h2>
+
+    <div class="container">
+        <!-- Seleção da Barbearia -->
+        <label for="barbearia">Escolha a Barbearia:</label>
+        <select id="barbearia" required>
+            <!-- Opções de barbearias serão carregadas aqui -->
+        </select>
+
+        <label for="servico">Selecione o Serviço:</label>
+        <select id="servico" required>
+            <!-- Opções de serviços serão carregadas aqui -->
+        </select>
+
+        <label for="date">Selecione a Data:</label>
+        <input type="date" id="date" required>
+
+        <button onclick="verificarHorariosDisponiveis()">Verificar Horários Disponíveis</button>
+
+        <div id="horariosGrid" class="horarios-grid">
+            <!-- Horários disponíveis serão exibidos aqui -->
+        </div>
+
+        <button id="agendarBtn" style="display: none;">Agendar Horário</button>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        let barbeariaSelecionada = null;
+        let horarioSelecionado = null;
+
+        function carregarBarbearias() {
+            const barbearias = JSON.parse(localStorage.getItem('barbearias')) || [];
+            const selectBarbearia = document.getElementById('barbearia');
+            selectBarbearia.innerHTML = '';
+
+            barbearias.forEach((barbearia, index) => {
+                const option = document.createElement('option');
+                option.value = index; // Índice da barbearia
+                option.text = barbearia.nome;
+                selectBarbearia.appendChild(option);
+            });
+        }
+
+        function carregarServicos() {
+            const barbearias = JSON.parse(localStorage.getItem('barbearias')) || [];
+            const barbeariaIndex = document.getElementById('barbearia').value;
+            const barbearia = barbearias[barbeariaIndex];
+            barbeariaSelecionada = barbearia; // Guardar barbearia selecionada
+            const selectServico = document.getElementById('servico');
+            selectServico.innerHTML = '';
+
+            barbearia.servicos.forEach(servico => {
+                const option = document.createElement('option');
+                option.value = servico.duracao;
+                option.text = `${servico.nome} - ${servico.duracao} min - R$ ${servico.preco}`;
+                selectServico.appendChild(option);
+            });
+        }
+
+        function exibirHorarios() {
+            const container = document.getElementById('availableSlots');
+            container.innerHTML = ''; // Limpar horários
+
+            const duracaoServico = parseInt(document.getElementById('servico').value);
+            const horarioAbertura = barbeariaSelecionada.horarioAbertura;
+            const horarioFechamento = barbeariaSelecionada.horarioFechamento;
+
+            const aberturaMinutos = converterHoraParaMinutos(horarioAbertura);
+            const fechamentoMinutos = converterHoraParaMinutos(horarioFechamento);
+            horarioSelecionado = null;
+
+            for (let minutos = aberturaMinutos; minutos + duracaoServico <= fechamentoMinutos; minutos += 30) {
+                const horario = converterMinutosParaHora(minutos);
+                const horarioDiv = document.createElement('div');
+                horarioDiv.classList.add('horario-quad');
+                horarioDiv.innerText = horario;
+
+                horarioDiv.addEventListener('click', function() {
+                    horarioSelecionado = horario;
+                    document.getElementById('agendar').style.display = 'block';
+                });
+
+                container.appendChild(horarioDiv);
+            }
+        }
+
+        function converterHoraParaMinutos(hora) {
+            const [h, m] = hora.split(':').map(Number);
+            return h * 60 + m;
+        }
+
+        function converterMinutosParaHora(minutos) {
+            const h = String(Math.floor(minutos / 60)).padStart(2, '0');
+            const m = String(minutos % 60).padStart(2, '0');
+            return `${h}:${m}`;
+        }
+
+        function agendarServico() {
+            const dataSelecionada = document.getElementById('date').value;
+            const servicoSelecionado = document.getElementById('servico').selectedOptions[0].text;
+
+            if (!horarioSelecionado || !dataSelecionada) {
+                alert('Por favor, selecione um horário e uma data válidos.');
+                return;
+            }
+
+            const agendamentos = JSON.parse(localStorage.getItem('agendamentos')) || [];
+            agendamentos.push({
+                barbearia: barbeariaSelecionada.nome,
+                servico: servicoSelecionado,
+                data: dataSelecionada,
+                horario: horarioSelecionado
+            });
+
+            localStorage.setItem('agendamentos', JSON.stringify(agendamentos));
+            alert('Agendamento realizado com sucesso!');
+            document.getElementById('agendar').style.display = 'none';
+        }
+
+        document.getElementById('barbearia').addEventListener('change', carregarServicos);
+        document.getElementById('checkAvailability').addEventListener('click', exibirHorarios);
+        document.getElementById('agendar').addEventListener('click', agendarServico);
+
+        // Carregar barbearias ao iniciar
+        carregarBarbearias();
+
+        function verificarHorariosDisponiveis() {
+    const barbeariaIndex = document.getElementById('barbearia').value;
+    const barbearias = JSON.parse(localStorage.getItem('barbearias')) || [];
+    const barbearia = barbearias[barbeariaIndex];
+
+    const grid = document.getElementById('horariosGrid');
+    grid.innerHTML = ''; // Limpar grid anterior
+
+    let horarioInicio = parseInt(barbearia.horarioAbertura.split(':')[0]);
+    let horarioFim = parseInt(barbearia.horarioFechamento.split(':')[0]);
+
+    for (let hora = horarioInicio; hora < horarioFim; hora++) {
+        for (let minuto = 0; minuto < 60; minuto += 30) { // Intervalo de 30 minutos
+            let horario = `${hora}:${minuto === 0 ? '00' : minuto}`;
+            const horarioDiv = document.createElement('div');
+            horarioDiv.classList.add('horario-quad');
+            horarioDiv.textContent = horario;
+            horarioDiv.onclick = function() {
+                selecionarHorario(horario, barbeariaIndex);
+            };
+            grid.appendChild(horarioDiv);
+        }
+    }
+}
+function selecionarHorario(horario, barbeariaIndex) {
+    const agendamentos = JSON.parse(localStorage.getItem('agendamentos')) || [];
+    if (agendamentos.some(ag => ag.horario === horario && ag.barbeariaIndex === barbeariaIndex)) {
+        alert('Este horário já está agendado!');
+        return;
+    }
+
+    const novoAgendamento = {
+        barbeariaIndex,
+        horario,
+        cliente: 'Nome do Cliente' // Aqui você deveria integrar o sistema de login do cliente
+    };
+
+    agendamentos.push(novoAgendamento);
+    localStorage.setItem('agendamentos', JSON.stringify(agendamentos));
+
+    document.getElementById('horariosGrid').querySelectorAll('.horario-quad').forEach(div => {
+        if (div.textContent === horario) div.classList.add('indisponivel');
+    });
+
+    alert('Horário agendado com sucesso!');
+}
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const barbeariaId = urlParams.get('barbeariaId'); // Pegando o ID da barbearia da URL
+
+    if (barbeariaId) {
+        const select = document.getElementById('barbearia');
+        select.value = barbeariaId; // Definindo o valor selecionado baseado no ID
+        carregarServicos(barbeariaId); // Função para carregar os serviços da barbearia selecionada
+    }
+});
+
+    </script>
+</body>
+</html
